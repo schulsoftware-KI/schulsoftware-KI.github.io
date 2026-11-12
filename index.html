@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kostenlose Schulsoftware – Stundenplan, Sitzplan, Klassenbildung und mehr</title>
+<meta name="description" content="Fünf kostenlose Programme für die Schulorganisation: Klassen bilden, Unterricht verteilen, Stundenplan erstellen, Sitzpläne anlegen und Mehrarbeit abrechnen. Rein lokal, Quellcode offen auf GitHub.">
+<link rel="canonical" href="https://schulsoftware-ki.github.io/">
+<meta property="og:title" content="Kostenlose Schulsoftware">
+<meta property="og:description" content="Fünf kostenlose Programme für die Schulorganisation – vom Klassenbilden bis zur Mehrarbeitsabrechnung.">
+<meta property="og:url" content="https://schulsoftware-ki.github.io/">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='7' fill='%231b2a4a'/%3E%3Crect x='7' y='9' width='8' height='6' rx='1.5' fill='%23dce7f3'/%3E%3Crect x='17' y='9' width='8' height='6' rx='1.5' fill='%23dce7f3'/%3E%3Crect x='7' y='17' width='8' height='6' rx='1.5' fill='%23dce7f3'/%3E%3Crect x='17' y='17' width='8' height='6' rx='1.5' fill='%232e8b57'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --navy:#1b2a4a;
+    --navy-2:#22345c;
+    --steel:#2e5a8a;
+    --seat:#dce7f3;
+    --seat-line:#b9cde6;
+    --paper:#f4f6fa;
+    --ink:#1d2733;
+    --ink-soft:#5a6675;
+    --line:#dde3ec;
+    --green:#2e8b57;
+    --green-dark:#256f46;
+    --red:#c0392b;
+    --amber:#b7791f;
+    --amber-bg:#fdf3e1;
+    --card:#ffffff;
+    --radius:10px;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Segoe UI","Segoe UI Web (West European)",Roboto,-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--steel);}
+  h1,h2,h3{line-height:1.2;margin:0;font-weight:600;letter-spacing:-0.01em;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+
+  /* ── Kopf / Blackboard-Leiste ── */
+  .topbar{
+    background:var(--navy);
+    color:#fff;
+    padding:14px 0;
+    border-bottom:3px solid var(--steel);
+  }
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:1.05rem;color:#fff;text-decoration:none;}
+  .brand .mark{
+    width:26px;height:26px;border-radius:6px;flex:0 0 auto;
+    background:linear-gradient(180deg,#3f6aa5,#22345c);
+    border:1px solid #4a75b0;
+  }
+  .topnav a.home{color:#fff;}
+  .topnav a.home::before{content:"← ";}
+  .topnav a{color:#c9d6ea;text-decoration:none;margin-left:22px;font-size:.95rem;}
+  .topnav a:hover{color:#fff;}
+
+  /* ── Hero ── */
+  .hero{padding:64px 0 40px;}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;}
+  .eyebrow{
+    text-transform:uppercase;letter-spacing:.14em;font-size:.72rem;font-weight:600;
+    color:var(--steel);margin-bottom:14px;
+  }
+  .hero h1{font-size:2.5rem;margin-bottom:16px;}
+  .hero p.lead{font-size:1.12rem;color:var(--ink-soft);margin:0 0 28px;max-width:38ch;}
+  .cta-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;}
+  .btn{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:12px 20px;border-radius:8px;font-size:.98rem;font-weight:600;
+    text-decoration:none;border:1px solid transparent;transition:background .15s,transform .05s;
+    font-family:inherit;cursor:pointer;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--green);color:#fff;}
+  .btn-primary:hover{background:var(--green-dark);}
+  .btn-secondary{background:#fff;color:var(--navy);border-color:var(--line);}
+  .btn-secondary:hover{border-color:var(--steel);}
+  .btn-sm{padding:8px 14px;font-size:.9rem;}
+  .btn .ic{font-size:1.05rem;line-height:1;}
+  .platform-note{font-size:.82rem;color:var(--ink-soft);margin-top:14px;}
+
+  /* ── Hero-Signatur: Karte mit Tafel-Kopf ── */
+  .plan{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px;box-shadow:0 12px 30px rgba(27,42,74,.08);
+  }
+  .plan .board{
+    background:var(--navy);color:#fff;text-align:center;font-size:.62rem;font-weight:600;
+    letter-spacing:.16em;padding:6px;border-radius:5px;margin-bottom:14px;
+  }
+  .seat{
+    background:var(--seat);border:1px solid var(--seat-line);border-radius:6px;
+    height:34px;display:flex;align-items:center;justify-content:center;
+    font-size:.62rem;color:var(--steel);font-weight:600;
+  }
+  .seat.free{background:#f5f7fa;color:#aeb8c6;border-style:dashed;}
+  .seat.warn{background:#f9dcd8;border-color:var(--red);color:var(--red);}
+  .seat.ok{background:#dcefe3;border-color:#9fcfb1;color:var(--green-dark);}
+
+  /* ── Sektionen ── */
+  section{padding:56px 0;border-top:1px solid var(--line);}
+  .section-head{max-width:60ch;margin-bottom:36px;}
+  .section-head .eyebrow{margin-bottom:10px;}
+  .section-head h2{font-size:1.7rem;margin-bottom:10px;}
+  .section-head p{color:var(--ink-soft);margin:0;}
+
+  /* ── Funktionen ── */
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .features.four{grid-template-columns:repeat(4,1fr);}
+  .feature{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;
+  }
+  .feature h3{font-size:1.05rem;margin-bottom:8px;color:var(--navy);}
+  .feature p{margin:0;color:var(--ink-soft);font-size:.94rem;}
+  .tag{
+    display:inline-block;font-size:.66rem;font-weight:600;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--steel);background:#eaf1f9;
+    border-radius:5px;padding:3px 8px;margin-bottom:12px;
+  }
+
+  /* ── Schritte / Voraussetzungen ── */
+  .install{display:grid;grid-template-columns:1.2fr .8fr;gap:36px;align-items:start;}
+  .steps{counter-reset:step;list-style:none;padding:0;margin:0;}
+  .steps li{position:relative;padding:0 0 18px 46px;color:var(--ink-soft);}
+  .steps li::before{
+    counter-increment:step;content:counter(step);
+    position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;
+    background:var(--navy);color:#fff;font-weight:600;font-size:.9rem;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .steps li b{color:var(--ink);}
+  .req{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;}
+  .req h3{font-size:1rem;color:var(--navy);margin-bottom:12px;}
+  .req dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:.92rem;}
+  .req dt{color:var(--ink-soft);}
+  .req dd{margin:0;font-weight:600;}
+  .req + .req{margin-top:20px;}
+  code{font-family:Consolas,"Cascadia Mono",ui-monospace,monospace;font-size:.88em;background:#eaf1f9;color:var(--navy);padding:1px 5px;border-radius:4px;}
+
+  /* ── Hinweise ── */
+  .notes{list-style:none;padding:0;margin:0;display:grid;gap:12px;}
+  .notes li{
+    background:#fff;border:1px solid var(--line);border-left:4px solid var(--amber);
+    border-radius:var(--radius);padding:14px 18px;color:var(--ink-soft);font-size:.94rem;
+  }
+  .notes li b{color:var(--ink);}
+  .callout{
+    background:var(--amber-bg);border:1px solid #efd3a3;border-radius:var(--radius);
+    padding:14px 18px;font-size:.92rem;color:#6b4a12;margin-top:28px;
+  }
+
+  /* ── Fuß ── */
+  footer{background:var(--navy);color:#c9d6ea;padding:32px 0;font-size:.9rem;}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  footer a{color:#fff;}
+
+  /* ── Hero-Signatur: das Schuljahr als Kette ── */
+  .chain{list-style:none;margin:0;padding:0;position:relative;}
+  .chain::before{
+    content:"";position:absolute;left:15px;top:30px;bottom:24px;width:2px;background:var(--seat-line);
+  }
+  .chain .phase{
+    font-size:.6rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--ink-soft);padding:8px 0 4px 44px;
+  }
+  .chain .phase:first-child{padding-top:0;}
+  .chain a{
+    display:grid;grid-template-columns:30px 1fr;gap:14px;align-items:center;
+    padding:4px 0;text-decoration:none;color:inherit;
+  }
+  .chain .num{
+    width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;
+    font-weight:600;font-size:.85rem;display:flex;align-items:center;justify-content:center;
+    position:relative;z-index:1;box-shadow:0 0 0 3px #fff;
+  }
+  .chain .box{
+    background:var(--seat);border:1px solid var(--seat-line);border-radius:6px;
+    padding:7px 12px;display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    transition:border-color .15s,background .15s;
+  }
+  .chain a:hover .box{border-color:var(--steel);background:#e6eef8;}
+  .chain .box b{font-size:.9rem;color:var(--navy);font-weight:600;}
+  .chain .box span{font-size:.72rem;color:var(--steel);font-weight:600;text-align:right;}
+
+  /* ── Programmkarten ── */
+  .progs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .prog{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;display:flex;flex-direction:column;scroll-margin-top:24px;
+  }
+  .prog:target{border-color:var(--steel);box-shadow:0 0 0 3px #eaf1f9;}
+  .prog-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .prog-head .num{
+    width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;
+    font-weight:600;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  }
+  .prog-head .tag{margin:0;}
+  .prog h3{font-size:1.15rem;color:var(--navy);margin-bottom:4px;}
+  .prog h3 a{color:inherit;text-decoration:none;}
+  .prog h3 a:hover{color:var(--steel);text-decoration:underline;}
+  .prog .url{display:block;font-size:.8rem;color:var(--steel);margin-bottom:10px;word-break:break-all;text-decoration:none;}
+  .prog .url::before{content:"🔗 ";}
+  .prog .url:hover{text-decoration:underline;}
+  .prog p{margin:0 0 16px;color:var(--ink-soft);font-size:.94rem;}
+  .prog .meta{
+    font-size:.82rem;color:var(--ink-soft);border-top:1px solid var(--line);
+    padding-top:12px;margin:auto 0 14px;
+  }
+  .prog .meta em{display:block;font-style:normal;color:var(--amber);margin-top:2px;}
+  .prog .links{display:flex;gap:8px;flex-wrap:wrap;}
+  .prog.idea{background:transparent;border-style:dashed;border-color:var(--seat-line);justify-content:center;}
+  .prog.idea h3{font-size:1.05rem;}
+
+  /* ── Kontakt ── */
+  .contact{display:grid;grid-template-columns:.8fr 1.2fr;gap:36px;align-items:start;}
+  .contact .section-head{margin-bottom:0;}
+  .contact .small{font-size:.85rem;color:var(--ink-soft);margin-top:16px;}
+  .form{
+    background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+    padding:22px;display:grid;gap:14px;position:relative;
+  }
+  .field label{display:block;font-size:.85rem;font-weight:600;color:var(--navy);margin-bottom:5px;}
+  .field input,.field select,.field textarea{
+    width:100%;font:inherit;font-size:.95rem;padding:10px 12px;color:var(--ink);
+    border:1px solid var(--line);border-radius:8px;background:#fff;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #b9cde6;border-color:var(--steel);}
+  .field textarea{min-height:130px;resize:vertical;}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
+  .form .btn{justify-self:start;}
+  .form .btn:disabled{opacity:.6;cursor:default;}
+  .form-status{margin:0;font-size:.9rem;min-height:1.3em;color:var(--ink-soft);}
+  .form-status.ok{color:var(--green-dark);}
+  .form-status.err{color:var(--red);}
+  @media (max-width:520px){.two{grid-template-columns:1fr;}}
+  /* ── Responsiv ── */
+  @media (max-width:860px){
+    .hero{padding:40px 0 32px;}
+    .hero .wrap{grid-template-columns:1fr;gap:32px;}
+    .hero h1{font-size:2rem;}
+    .features,.features.four,.progs{grid-template-columns:1fr 1fr;}
+    .install,.contact{grid-template-columns:1fr;}
+    .topnav a:not(.home){display:none;}
+    .topnav a.home{margin-left:0;}
+  }
+  @media (max-width:520px){
+    .wrap{padding:0 18px;}
+    .features,.features.four,.progs{grid-template-columns:1fr;}
+    .hero h1{font-size:1.7rem;}
+    section{padding:44px 0;}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="https://schulsoftware-ki.github.io/"><span class="mark"></span>Kostenlose Schulsoftware</a>
+    <nav class="topnav">
+      <a href="#programme">Programme</a>
+      <a href="#grundsaetze">Grundsätze</a>
+      <a href="#kontakt">Kontakt</a>
+      <a href="https://github.com/schulsoftware-KI">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ── Hero ── -->
+<div class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Fünf Programme für die Schulorganisation</div>
+      <h1>Kostenlose Werkzeuge, die die Planungsarbeit übernehmen.</h1>
+      <p class="lead">Vom Bilden neuer Klassen über Unterrichtsverteilung und Stundenplan bis zu Sitzplan und Mehrarbeitsabrechnung – jedes Programm übersetzt Ihre Vorgaben in eine Optimierung und liefert fertige, prüfbare Ergebnisse.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#programme">
+          <span class="ic">↓</span> Zu den Programmen
+        </a>
+        <a class="btn btn-secondary" href="https://github.com/schulsoftware-KI">
+          Alle Projekte auf GitHub
+        </a>
+      </div>
+      <p class="platform-note">Kostenlos · läuft auf dem eigenen Rechner · Quellcode offen einsehbar</p>
+    </div>
+
+    <!-- Signatur: das Schuljahr als Kette der fünf Programme -->
+    <nav class="plan" aria-label="Websites der Programme im Ablauf des Schuljahres">
+      <div class="board">DAS SCHULJAHR</div>
+      <ol class="chain">
+        <li class="phase">Vor dem Schuljahr</li>
+        <li><a href="https://schulsoftware-ki.github.io/Klassenverteilungsoptimierer/"><span class="num">1</span><span class="box"><b>Klassen bilden</b><span>Klassenverteilung</span></span></a></li>
+        <li><a href="https://schulsoftware-ki.github.io/Unterrichtsverteilungsoptimierer/"><span class="num">2</span><span class="box"><b>Unterricht verteilen</b><span>UV-Optimierer</span></span></a></li>
+        <li><a href="https://schulsoftware-ki.github.io/Stundenplanprogramm/"><span class="num">3</span><span class="box"><b>Stundenplan erstellen</b><span>Stundenplan-Generator</span></span></a></li>
+        <li class="phase">Zum Schuljahresstart</li>
+        <li><a href="https://schulsoftware-ki.github.io/SitzplanApp/"><span class="num">4</span><span class="box"><b>Sitzpläne anlegen</b><span>Sitzplan-Optimierer</span></span></a></li>
+        <li class="phase">Laufend im Schuljahr</li>
+        <li><a href="https://schulsoftware-ki.github.io/Mehrarbeitsabrechnung-LBV-Formular/"><span class="num">5</span><span class="box"><b>Mehrarbeit abrechnen</b><span>Mehrarbeitsabrechnung</span></span></a></li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<!-- ── Programme ── -->
+<section id="programme">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Die Programme</div>
+      <h2>Ein Werkzeug für jeden Planungsschritt</h2>
+      <p>Jedes Programm hat eine eigene Website mit Funktionen, Anleitung und Download – einfach auf den Namen oder „Zur Website“ tippen.</p>
+    </div>
+    <div class="progs">
+
+      <article class="prog" id="klassenverteilung">
+        <div class="prog-head"><span class="num">1</span><span class="tag">Excel-Makro</span></div>
+        <h3><a href="https://schulsoftware-ki.github.io/Klassenverteilungsoptimierer/">Klassenverteilungsoptimierer</a></h3>
+        <a class="url" href="https://schulsoftware-ki.github.io/Klassenverteilungsoptimierer/">schulsoftware-ki.github.io/Klassenverteilungsoptimierer</a>
+        <p>Verteilt neue Schülerinnen und Schüler ausgewogen auf Klassen – nach Wünschen, Konflikten, Geschlecht und Schulformempfehlung – und liefert die fünf besten Lösungen zum Vergleich.</p>
+        <div class="meta">Microsoft Excel mit aktivierten Makros</div>
+        <div class="links">
+          <a class="btn btn-primary btn-sm" href="https://schulsoftware-ki.github.io/Klassenverteilungsoptimierer/">Zur Website →</a>
+          <a class="btn btn-secondary btn-sm" href="https://github.com/schulsoftware-KI/Klassenverteilungsoptimierer">GitHub</a>
+        </div>
+      </article>
+
+      <article class="prog" id="unterrichtsverteilung">
+        <div class="prog-head"><span class="num">2</span><span class="tag">Windows-Programm</span></div>
+        <h3><a href="https://schulsoftware-ki.github.io/Unterrichtsverteilungsoptimierer/">UV-Optimierer</a></h3>
+        <a class="url" href="https://schulsoftware-ki.github.io/Unterrichtsverteilungsoptimierer/">schulsoftware-ki.github.io/Unterrichtsverteilungsoptimierer</a>
+        <p>Verteilt Fächer und Klassen automatisch auf die Lehrkräfte – mit harten Regeln, ausgewogener Belastung und nachvollziehbaren Auswertungen.</p>
+        <div class="meta">Windows · arbeitet mit einer Excel-Datei</div>
+        <div class="links">
+          <a class="btn btn-primary btn-sm" href="https://schulsoftware-ki.github.io/Unterrichtsverteilungsoptimierer/">Zur Website →</a>
+          <a class="btn btn-secondary btn-sm" href="https://github.com/schulsoftware-KI/Unterrichtsverteilungsoptimierer">GitHub</a>
+        </div>
+      </article>
+
+      <article class="prog" id="stundenplan">
+        <div class="prog-head"><span class="num">3</span><span class="tag">Windows-Programm</span></div>
+        <h3><a href="https://schulsoftware-ki.github.io/Stundenplanprogramm/">Stundenplan-Generator</a></h3>
+        <a class="url" href="https://schulsoftware-ki.github.io/Stundenplanprogramm/">schulsoftware-ki.github.io/Stundenplanprogramm</a>
+        <p>Erstellt Stundenpläne mit einem echten Optimierungs-Solver, vermeidet Hohl- und Randstunden und liest und schreibt Untis-Dateien. Für Gymnasium, Gesamtschule und Realschule.</p>
+        <div class="meta">Windows 10/11 · Untis-kompatibel (GPU)</div>
+        <div class="links">
+          <a class="btn btn-primary btn-sm" href="https://schulsoftware-ki.github.io/Stundenplanprogramm/">Zur Website →</a>
+          <a class="btn btn-secondary btn-sm" href="https://github.com/schulsoftware-KI/Stundenplanprogramm">GitHub</a>
+        </div>
+      </article>
+
+      <article class="prog" id="sitzplan">
+        <div class="prog-head"><span class="num">4</span><span class="tag">Windows-Programm</span></div>
+        <h3><a href="https://schulsoftware-ki.github.io/SitzplanApp/">Sitzplan-Optimierer</a></h3>
+        <a class="url" href="https://schulsoftware-ki.github.io/SitzplanApp/">schulsoftware-ki.github.io/SitzplanApp</a>
+        <p>Erstellt aus Schülerdaten, Sitzwünschen und Raumplan automatisch mehrere bewertete Sitzpläne, die sich danach von Hand nachjustieren lassen.</p>
+        <div class="meta">Windows 10/11 · einzelne .exe, ohne Installation</div>
+        <div class="links">
+          <a class="btn btn-primary btn-sm" href="https://schulsoftware-ki.github.io/SitzplanApp/">Zur Website →</a>
+          <a class="btn btn-secondary btn-sm" href="https://github.com/schulsoftware-KI/SitzplanApp">GitHub</a>
+        </div>
+      </article>
+
+      <article class="prog" id="mehrarbeit">
+        <div class="prog-head"><span class="num">5</span><span class="tag">Excel + Hilfsprogramme</span></div>
+        <h3><a href="https://schulsoftware-ki.github.io/Mehrarbeitsabrechnung-LBV-Formular/">Mehrarbeitsabrechnung</a></h3>
+        <a class="url" href="https://schulsoftware-ki.github.io/Mehrarbeitsabrechnung-LBV-Formular/">schulsoftware-ki.github.io/Mehrarbeitsabrechnung-LBV-Formular</a>
+        <p>Berechnet die Mehrarbeit je Lehrkraft aus dem Untis-Export und füllt die LBV-Formulare zur Mehrarbeitsvergütung automatisch aus – einzeln oder als Sammeldatei.</p>
+        <div class="meta">Windows mit Excel · Untis-Export als Grundlage<em>Inoffizielles Hilfsmittel, keine Software des LBV</em></div>
+        <div class="links">
+          <a class="btn btn-primary btn-sm" href="https://schulsoftware-ki.github.io/Mehrarbeitsabrechnung-LBV-Formular/">Zur Website →</a>
+          <a class="btn btn-secondary btn-sm" href="https://github.com/schulsoftware-KI/Mehrarbeitsabrechnung-LBV-Formular">GitHub</a>
+        </div>
+      </article>
+
+      <article class="prog idea">
+        <h3>Idee oder Wunsch?</h3>
+        <p>Fehlt eine Funktion oder ein Werkzeug für einen anderen Planungsschritt? Rückmeldungen fließen in die Weiterentwicklung ein.</p>
+        <div class="links">
+          <a class="btn btn-secondary btn-sm" href="#kontakt">Nachricht schreiben</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Grundsätze ── -->
+<section id="grundsaetze">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Was alle Programme verbindet</div>
+      <h2>Gebaut für den Schulalltag</h2>
+      <p>Die Programme sind unabhängig voneinander nutzbar und folgen denselben Grundsätzen.</p>
+    </div>
+    <div class="features four">
+      <div class="feature">
+        <span class="tag">Kosten</span>
+        <h3>Kostenlos</h3>
+        <p>Ohne Anmeldung und ohne Lizenzgebühr. Die genauen Lizenzbedingungen stehen im jeweiligen Projekt.</p>
+      </div>
+      <div class="feature">
+        <span class="tag">Datenschutz</span>
+        <h3>Rein lokal</h3>
+        <p>Keine Cloud, kein Konto: Gerechnet wird auf dem eigenen Rechner, die Daten bleiben an der Schule.</p>
+      </div>
+      <div class="feature">
+        <span class="tag">Excel</span>
+        <h3>Vertrautes Datenformat</h3>
+        <p>Eingaben und Ergebnisse liegen in Excel-Dateien, die sich prüfen, weitergeben und archivieren lassen.</p>
+      </div>
+      <div class="feature">
+        <span class="tag">Transparenz</span>
+        <h3>Offener Quellcode</h3>
+        <p>Der Quellcode aller Programme liegt öffentlich auf GitHub und kann jederzeit eingesehen werden.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Kontakt ── -->
+<section id="kontakt">
+  <div class="wrap contact">
+    <div class="section-head">
+      <div class="eyebrow">Kontakt</div>
+      <h2>Frage oder Rückmeldung?</h2>
+      <p>Fragen, Fehlerberichte oder Wünsche zu einem der Programme – die Nachricht geht per E-Mail an den Entwickler.</p>
+      <p class="small">Die Angaben werden nur zur Beantwortung der Nachricht verwendet.</p>
+    </div>
+
+    <form class="form" id="contactForm">
+      <input type="hidden" name="access_key" value="7b5366eb-a624-4973-9f59-e69b0012648d">
+      <input type="hidden" name="subject" value="Neue Nachricht über die Seite „Kostenlose Schulsoftware“">
+      <input type="hidden" name="from_name" value="Kostenlose Schulsoftware – Übersichtsseite">
+      <!-- Spam-Schutz (Honeypot): bleibt für Menschen unsichtbar -->
+      <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <div class="two">
+        <div class="field">
+          <label for="cf-name">Name</label>
+          <input type="text" id="cf-name" name="name" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="cf-email">E-Mail (für die Antwort)</label>
+          <input type="email" id="cf-email" name="email" autocomplete="email" required>
+        </div>
+      </div>
+      <div class="field">
+        <label for="cf-programm">Betrifft</label>
+        <select id="cf-programm" name="programm">
+          <option>Allgemein</option>
+          <option>Klassenverteilungsoptimierer</option>
+          <option>UV-Optimierer</option>
+          <option>Stundenplan-Generator</option>
+          <option>Sitzplan-Optimierer</option>
+          <option>Mehrarbeitsabrechnung</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="cf-message">Nachricht</label>
+        <textarea id="cf-message" name="message" required></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Nachricht senden</button>
+      <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>Kostenlose Schulsoftware · Programme für die Schulorganisation</span>
+    <span><a href="https://github.com/schulsoftware-KI">Alle Projekte auf GitHub</a></span>
+  </div>
+</footer>
+
+<!-- Strukturierte Daten für Suchmaschinen -->
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"ItemList",
+  "name":"Kostenlose Schulsoftware",
+  "url":"https://schulsoftware-ki.github.io/",
+  "itemListElement":[
+    {"@type":"ListItem","position":1,"item":{"@type":"SoftwareApplication","name":"Klassenverteilungsoptimierer","applicationCategory":"EducationalApplication","operatingSystem":"Microsoft Excel (Windows)","url":"https://schulsoftware-ki.github.io/Klassenverteilungsoptimierer/","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}},
+    {"@type":"ListItem","position":2,"item":{"@type":"SoftwareApplication","name":"UV-Optimierer","applicationCategory":"EducationalApplication","operatingSystem":"Windows","url":"https://schulsoftware-ki.github.io/Unterrichtsverteilungsoptimierer/","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}},
+    {"@type":"ListItem","position":3,"item":{"@type":"SoftwareApplication","name":"Stundenplan-Generator","applicationCategory":"EducationalApplication","operatingSystem":"Windows 10, Windows 11","url":"https://schulsoftware-ki.github.io/Stundenplanprogramm/","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}},
+    {"@type":"ListItem","position":4,"item":{"@type":"SoftwareApplication","name":"Sitzplan-Optimierer","applicationCategory":"EducationalApplication","operatingSystem":"Windows 10, Windows 11","url":"https://schulsoftware-ki.github.io/SitzplanApp/","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}},
+    {"@type":"ListItem","position":5,"item":{"@type":"SoftwareApplication","name":"Mehrarbeitsabrechnung","applicationCategory":"BusinessApplication","operatingSystem":"Microsoft Excel (Windows)","url":"https://schulsoftware-ki.github.io/Mehrarbeitsabrechnung-LBV-Formular/","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}}
+  ]
+}
+</script>
+
+<script>
+  // Kontaktformular an Web3Forms senden – ohne Seitenwechsel.
+  (function(){
+    var form = document.getElementById('contactForm');
+    if(!form){return;}
+    var status = document.getElementById('formStatus');
+    var btn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      status.className = 'form-status';
+      status.textContent = 'Wird gesendet …';
+      btn.disabled = true;
+
+      var data = Object.fromEntries(new FormData(form).entries());
+      data.subject = data.subject + ' – ' + (data.programm || 'Allgemein');
+
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(function(res){ return res.json().then(function(j){ return { ok: res.ok, j: j }; }); })
+      .then(function(r){
+        if(r.ok){
+          status.className = 'form-status ok';
+          status.textContent = 'Danke! Die Nachricht wurde gesendet.';
+          form.reset();
+        } else {
+          status.className = 'form-status err';
+          status.textContent = 'Das hat nicht geklappt: ' + (r.j.message || 'Bitte später erneut versuchen.');
+        }
+      })
+      .catch(function(){
+        status.className = 'form-status err';
+        status.textContent = 'Verbindungsfehler – bitte später erneut versuchen.';
+      })
+      .then(function(){ btn.disabled = false; });
+    });
+  })();
+</script>
+
+<!-- Besucherzählung (GoatCounter) -->
+<script data-goatcounter="https://stundenplan.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+</body>
+</html>
